@@ -5,11 +5,7 @@ Application Node.js pour tester l'intégration avec l'API Spotify, containerisé
 ## Configuration rapide
 
 ```bash
-# Construire l'image
-docker-compose build
-
-# Démarrer le conteneur
-docker-compose up
+docker-compose up --build
 ```
 
 ## Variables d'environnement
