@@ -1,0 +1,19 @@
+{
+  "name": "testspotify-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt prepare && nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "nuxt": "4.1.3"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.13.2"
+  },
+  "overrides": {
+    "serialize-javascript": "^6.0.2"
+  }
+}

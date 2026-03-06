@@ -1,9 +1,9 @@
 services:
-  app:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: testspotify-app
+    container_name: testspotify-api
     env_file:
       - .env
     ports:
@@ -12,4 +12,17 @@ services:
       - .:/app
       - /app/node_modules
     command: npm run dev
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: testspotify-web
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.nuxt
     restart: unless-stopped
