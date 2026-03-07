@@ -11,6 +11,10 @@
     "web:install": "cd web && npm install"
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"
   },
