@@ -19,8 +19,8 @@ services:
       context: ./web
       dockerfile: Dockerfile
     container_name: testspotify-web
-    environment:
-      - NUXT_API_BASE=http://api:3000
+    env_file:
+      - .env
     ports:
       - "4000:4000"
     volumes:
