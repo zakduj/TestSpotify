@@ -4,7 +4,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const token = req.cookies?.spotify_token;
 
   if (!token) {
-    res.status(401).json({ error: 'Non authentifie' });
+    res.status(401).json({ error: 'not identified' });
     return;
   }
 

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' });
 
+const query = ref('');
+const results = ref([]);
+
 async function logout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
@@ -10,22 +13,53 @@ async function logout() {
   }
 }
 
+async function search() {
+  if (!query.value.trim()) return;
+  // TODO: appel API
+}
 </script>
 
 <template>
-  <main class="min-h-screen bg-zinc-950 px-4 py-10 text-zinc-100 flex items-center justify-center">
-    <section class="mx-auto max-w-md rounded-2xl border border-zinc-800 bg-zinc-900/70 p-10 shadow-2xl text-center">
-      <h1 class="text-2xl font-semibold mb-2">Search</h1>
-      <p class="text-sm text-zinc-400">This page is under construction.</p>
-    </section>
-      <button class="w-full rounded-xl bg-brand-500 px-4 py-3 text-sm font-medium text-black transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
-      @click="logout">
-        Disconect
-      </button>
-    <section>
+  <div class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
 
-    </section>
-  </main>
+    <header class="w-full border-b border-zinc-800 bg-zinc-900/70 px-6 py-4 flex items-center justify-between">
+      <h1 class="text-lg font-semibold tracking-wide">TestSpotify</h1>
+      <button
+        class="rounded-xl bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-zinc-600"
+        @click="logout"
+      >
+        Logout
+      </button>
+    </header>
+
+    <main class="flex-1 px-6 py-10">
+      <div class="mx-auto max-w-2xl">
+        <div class="flex gap-2 mb-8">
+          <input
+            v-model="query"
+            type="text"
+            placeholder="Search an artist..."
+            class="flex-1 rounded-xl bg-zinc-800 border border-zinc-700 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 outline-none focus:border-green-500 transition"
+            @keyup.enter="search"
+          />
+          <button
+            class="rounded-xl bg-green-500 px-5 py-3 text-sm font-medium text-black transition hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="!query.trim()"
+            @click="search"
+          >
+            Search
+          </button>
+        </div>
+
+        <section v-if="results.length > 0">
+          <!-- TODO: afficher les résultats -->
+        </section>
+        <p v-else class="text-center text-zinc-500 text-sm">No result</p>
+
+      </div>
+    </main>
+
+  </div>
 </template>
 
 <style scoped>
