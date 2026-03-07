@@ -1,6 +1,6 @@
 import { defineNuxtConfig } from 'nuxt/config';
 
-const API_PROXY_URL = process.env.NUXT_API_PROXY_URL;
+const API_PROXY_URL = process.env.NUXT_API_PROXY_URL || 'http://api:3000';
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-06',
