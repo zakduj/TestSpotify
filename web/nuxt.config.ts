@@ -1,5 +1,7 @@
 import { defineNuxtConfig } from 'nuxt/config';
 
+const API_PROXY_URL = process.env.NUXT_API_PROXY_URL;
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-06',
   srcDir: 'src/',
@@ -12,13 +14,12 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/api/**': { proxy: 'http://127.0.0.1:3000/**' }
+    '/api/**': { proxy: `${API_PROXY_URL}/**` }
   },
 
   runtimeConfig: {
-    apiBase: process.env.NUXT_API_BASE || 'http://localhost:3000',
     public: {
-      apiBase: 'http://localhost:3000'
+      apiUrl: process.env.NUXT_API_PROXY_URL
     }
   }
 });
