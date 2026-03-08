@@ -25,49 +25,11 @@ interface SpotifyArtistSearchResponse {
     };
 }
 
-export async function getSpotifyArtist(query: string) {
+export async function getSpotifyArtist(query: string, offset: number = 0) {
 
     const { access_token } = await getClientCredentialsToken();
 
-    const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${access_token}`
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Spotify API error: ${response.statusText}`);
-    }
-
-    const data = await response.json() as SpotifyArtistSearchResponse;
-    return data.artists;
-}
-
-export async function getNextSpotifyArtists(url: string) {
-
-    const { access_token } = await getClientCredentialsToken();
-
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${access_token}`
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Spotify API error: ${response.statusText}`);
-    }
-
-    const data = await response.json() as SpotifyArtistSearchResponse;
-    return data.artists;
-}
-
-export async function getpreviousSpotifyArtists(url: string) {
-
-    const { access_token } = await getClientCredentialsToken();
-
-    const response = await fetch(url, {
+    const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=20&offset=${offset}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${access_token}`
