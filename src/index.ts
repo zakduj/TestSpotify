@@ -6,6 +6,7 @@ import rootRouter from './routes/root.route';
 import healthRouter from './routes/health.route';
 import authRouter from './routes/auth.route';
 import searchRouter from "./routes/search.route";
+import artistRouter from "./routes/artist.route";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use('/', rootRouter);
 app.use('/health', healthRouter);
 app.use('/auth', authRouter);
 app.use('/search', searchRouter);
+app.use('/', artistRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route non trouvee' });

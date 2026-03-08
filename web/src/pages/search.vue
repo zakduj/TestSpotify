@@ -7,10 +7,14 @@ const results = ref<{ items: any[]; total: number; offset: number; limit: number
 async function logout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    window.location.href = '/login';
+    await navigateTo({ path:'/login'});
   } catch (e) {
     console.error(e);
   }
+}
+
+async function ArtistPage(id: string, name: string, image: string) {
+  await navigateTo({ path: '/artist', query: { id, name, image} });
 }
 
 async function fetchPage(offset: number = 0) {
@@ -79,7 +83,7 @@ async function previousPage() {
         </div>
 
         <section v-if="results?.items?.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          <div v-for="result in results?.items" :key="result.id" class="flex flex-col items-center bg-zinc-800 rounded-xl p-4 gap-3 hover:bg-zinc-700 transition">
+          <div v-for="result in results?.items" :key="result.id" class="flex flex-col items-center bg-zinc-800 rounded-xl p-4 gap-3 hover:bg-zinc-700 transition cursor-pointer" @click="ArtistPage(result.id, result.name, result.images?.[0]?.url)">
             <img
               v-if="result.images && result.images.length > 0"
               :src="result.images[0].url"
