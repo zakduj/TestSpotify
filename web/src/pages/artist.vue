@@ -1,15 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' });
 
-const route = useRoute();
-const artistId = route.query.id as string;
-const artistName = route.query.name as string;
-const artisteImages = route.query.image as string;
-
-useHead({ title: artistName ? `${artistName} — TestSpotify` : 'Artist — TestSpotify' });
-
+const artistState = useState('selectedArtist', () => ({ id: '', name: '', image: '' }));
+const artistId = artistState.value.id;
+const artistName = artistState.value.name;
+const artisteImages = artistState.value.image;
 const albums = ref('');
-const error = ref<string | null>(null);
 
 async function logout() {
   try {
@@ -34,7 +30,7 @@ async function fetchAlbums() {
     if (res.status === 401) { await navigateTo('/login'); return; }
     albums.value  = await res.json();
   } catch (e: any) {
-    error.value = e.message;
+    console.error(e);
   }
 }
 

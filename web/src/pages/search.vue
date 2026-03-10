@@ -14,7 +14,9 @@ async function logout() {
 }
 
 async function ArtistPage(id: string, name: string, image: string) {
-  await navigateTo({ path: '/artist', query: { id, name, image} });
+  const artistState = useState('selectedArtist', () => ({ id: '', name: '', image: '' }));
+  artistState.value = { id, name, image };
+  await navigateTo('/artist');
 }
 
 async function fetchPage(offset: number = 0) {
