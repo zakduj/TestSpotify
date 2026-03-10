@@ -37,7 +37,7 @@ export async function getSpotifyArtist(query: string, offset: number = 0) {
     });
 
     if (!response.ok) {
-        throw new Error(`Spotify API error: ${response.statusText}`);
+        throw new Error(`Spotify API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json() as SpotifyArtistSearchResponse;

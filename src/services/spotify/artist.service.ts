@@ -11,7 +11,7 @@ export async function getalbums(artistId: string) {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to fetch albums');
+        throw new Error(`Spotify API error: ${response.status} ${response.statusText}`);
     }
 
     return await response.json();

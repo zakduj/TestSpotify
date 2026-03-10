@@ -15,7 +15,7 @@ export async function getClientCredentialsToken(): Promise<{ access_token: strin
   });
 
   if (!response.ok) {
-    throw new Error('Impossible to get Spotify access token');
+    throw new Error(`Spotify API error: ${response.status} ${response.statusText}`);
   }
 
   return await response.json() as { access_token: string; expires_in: number };
