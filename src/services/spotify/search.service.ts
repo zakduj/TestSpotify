@@ -1,5 +1,3 @@
-import { getClientCredentialsToken } from './auth.service';
-
 interface SpotifyArtist {
     id: string;
     name: string;
@@ -25,14 +23,11 @@ interface SpotifyArtistSearchResponse {
     };
 }
 
-export async function getSpotifyArtist(query: string, offset: number = 0) {
-
-    const { access_token } = await getClientCredentialsToken();
-
+export async function getSpotifyArtist(query: string, accessToken: string, offset: number = 0) {
     const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=20&offset=${offset}`, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${access_token}`
+            'Authorization': `Bearer ${accessToken}`
         }
     });
 

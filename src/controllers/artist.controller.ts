@@ -1,10 +1,24 @@
 import {Request, Response} from "express";
-import {getalbums} from "../services/spotify/artist.service";
+import { getArtistAlbums } from "../services/spotify/artist.service";
+import {getSession} from "../store/session.store";
 
-export async function getAlbums(req: Request, res: Response): Promise<void> {
+export async function getArtistAlbumsController(req: Request, res: Response): Promise<void> {
+    const artistId = req.params.artistId as string;
+
+    if (!artistId || !/^[a-zA-Z0-9]{22}$/.test(artistId)) {
+        res.status(400).json({ error: 'Invalid artist ID' });
+        return;
+    }
+
+    const sessionId = req.signedCookies.session_id;
+    const session = getSession(sessionId);
+    if (!session) {
+        res.status(401).json({ error: 'Session expired' });
+        return;
+    }
+
     try {
-        const { artistId } = req.params;
-        const albums = await getalbums(artistId);
+        const albums = await getArtistAlbums(artistId, session.accessToken);
         res.json(albums);
     }
     catch (error) {

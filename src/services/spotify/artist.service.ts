@@ -1,12 +1,8 @@
-import {getClientCredentialsToken} from "./auth.service";
-
-export async function getalbums(artistId: string) {
-    const { access_token } = await getClientCredentialsToken();
-
+export async function getArtistAlbums(artistId: string | string[], accessToken: string) {
     const response = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${access_token}`,
+            Authorization: `Bearer ${accessToken}`,
         },
     });
 

@@ -1,17 +1,21 @@
 import { Request, Response, Router } from 'express';
 import { getClientCredentialsToken } from '../services/spotify/auth.service';
 import { authMiddleware } from '../middlewares/auth';
+import { createSession, deleteSession, getSession } from '../store/session.store';
 
 const authRouter = Router();
 
 authRouter.post('/login', async (req: Request, res: Response) => {
   try {
     const token = await getClientCredentialsToken();
-    res.cookie('spotify_token', token.access_token, {
+    const sessionId = createSession(token.access_token, token.expires_in);
+
+    res.cookie('session_id', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: token.expires_in * 1000
+      sameSite: 'strict',
+      signed: true,
+      maxAge: token.expires_in * 1000,
     });
 
     res.json({ success: true });
@@ -22,15 +26,23 @@ authRouter.post('/login', async (req: Request, res: Response) => {
 });
 
 authRouter.get('/check', authMiddleware, async (req: Request, res: Response) => {
-  const token = req.cookies.spotify_token;
+  const sessionId = req.signedCookies.session_id;
+  const session = getSession(sessionId);
+
+  if (!session) {
+    res.clearCookie('session_id');
+    res.status(401).json({ error: 'Token expired' });
+    return;
+  }
 
   try {
     const spotifyRes = await fetch(`${process.env.SPOTIFY_API_URL}/search?q=test&type=artist&limit=1`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${session.accessToken}` },
     });
 
     if (!spotifyRes.ok) {
-      res.clearCookie('spotify_token');
+      deleteSession(sessionId);
+      res.clearCookie('session_id');
       res.status(401).json({ error: 'Token expired' });
       return;
     }
@@ -41,8 +53,11 @@ authRouter.get('/check', authMiddleware, async (req: Request, res: Response) => 
   }
 });
 
-authRouter.post('/logout', (_req: Request, res: Response) => {
-  res.clearCookie('spotify_token');
+authRouter.post('/logout', (req: Request, res: Response) => {
+  const sessionId = req.signedCookies?.session_id;
+  if (sessionId) deleteSession(sessionId);
+
+  res.clearCookie('session_id');
   res.json({ success: true });
 });
 

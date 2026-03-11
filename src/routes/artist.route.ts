@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {authMiddleware} from "../middlewares/auth";
-import {getAlbums} from "../controllers/artist.controller";
+import { getArtistAlbumsController } from "../controllers/artist.controller";
 
 const artistRouter = Router();
 
-artistRouter.get('/artist/:artistId', authMiddleware, getAlbums);
+artistRouter.get('/artist/:artistId', authMiddleware, getArtistAlbumsController);
 
 export default artistRouter;
