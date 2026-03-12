@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAlbums } from '../../src/controllers/artist.controller';
+import { getArtistAlbumsController } from '../../src/controllers/artist.controller';
 import { Request, Response } from 'express';
 
 vi.mock('../../src/services/spotify/artist.service', () => ({
-  getalbums: vi.fn().mockResolvedValue({
+  getArtistAlbums: vi.fn().mockResolvedValue({
     items: [
       {
         id: 'album1',
@@ -19,13 +19,19 @@ vi.mock('../../src/services/spotify/artist.service', () => ({
   }),
 }));
 
-describe('getAlbums', () => {
+vi.mock('../../src/store/session.store', () => ({
+  getSession: vi.fn().mockReturnValue({ accessToken: 'fake_access_token', expiresAt: Date.now() + 3600000 }),
+}));
 
+describe('getArtistAlbumsController', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
 
   beforeEach(() => {
-    req = { params: { artistId: '4FpJcNgOvIpSBeJgRg3OfN' } };
+    req = {
+      params: { artistId: '4FpJcNgOvIpSBeJgRg3OfN' },
+      signedCookies: { session_id: 'fake_session_id' },
+    };
     res = {
       json: vi.fn(),
       status: vi.fn().mockReturnThis(),
@@ -33,7 +39,7 @@ describe('getAlbums', () => {
   });
 
   it('should return albums when the service succeeds', async () => {
-    await getAlbums(req as Request, res as Response);
+    await getArtistAlbumsController(req as Request, res as Response);
 
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
       items: expect.arrayContaining([
@@ -43,23 +49,22 @@ describe('getAlbums', () => {
   });
 
   it('should return 500 when artist is not found (404 from service)', async () => {
-    const { getalbums } = await import('../../src/services/spotify/artist.service');
-    vi.mocked(getalbums).mockRejectedValueOnce(new Error('Spotify albums error 404: Artist not found'));
+    const { getArtistAlbums } = await import('../../src/services/spotify/artist.service');
+    vi.mocked(getArtistAlbums).mockRejectedValueOnce(new Error('Spotify albums error 404: Artist not found'));
 
-    await getAlbums(req as Request, res as Response);
+    await getArtistAlbumsController(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: 'Error fetching albums' });
   });
 
   it('should return 500 when rate limit is exceeded (429 from service)', async () => {
-    const { getalbums } = await import('../../src/services/spotify/artist.service');
-    vi.mocked(getalbums).mockRejectedValueOnce(new Error('Spotify albums error 429: Rate limit exceeded, try again later'));
+    const { getArtistAlbums } = await import('../../src/services/spotify/artist.service');
+    vi.mocked(getArtistAlbums).mockRejectedValueOnce(new Error('Spotify albums error 429: Rate limit exceeded, try again later'));
 
-    await getAlbums(req as Request, res as Response);
+    await getArtistAlbumsController(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: 'Error fetching albums' });
   });
 });
-

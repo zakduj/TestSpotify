@@ -4,9 +4,7 @@ import { getSpotifyArtist } from '../../src/services/spotify/search.service';
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-vi.mock('../../src/services/spotify/auth.service', () => ({
-  getClientCredentialsToken: vi.fn().mockResolvedValue({ access_token: 'fake_token', expires_in: 3600 }),
-}));
+const FAKE_TOKEN = 'fake_access_token';
 
 const fakeArtist = {
   id: '4FpJcNgOvIpSBeJgRg3OfN',
@@ -43,7 +41,7 @@ describe('getSpotifyArtist', () => {
       }),
     });
 
-    const result = await getSpotifyArtist('Orelsan');
+    const result = await getSpotifyArtist('Orelsan', FAKE_TOKEN);
 
     expect(result.items).toHaveLength(1);
     expect(result.items[0].name).toBe('Orelsan');
@@ -56,7 +54,7 @@ describe('getSpotifyArtist', () => {
       json: async () => ({ artists: { items: [], total: 60, limit: 20, offset: 20, next: null, previous: null, href: '' } }),
     });
 
-    await getSpotifyArtist('rap', 20);
+    await getSpotifyArtist('rap', FAKE_TOKEN, 20);
 
     const [url] = mockFetch.mock.calls[0];
     expect(url).toContain('offset=20');
@@ -64,26 +62,26 @@ describe('getSpotifyArtist', () => {
 
   it('should throw when receiving a 401 Unauthorized', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 401, statusText: 'Unauthorized' });
-    await expect(getSpotifyArtist('test')).rejects.toThrow('Spotify API error: 401 Unauthorized');
+    expect(getSpotifyArtist('test', FAKE_TOKEN)).rejects.toThrow('Spotify API error: 401 Unauthorized');
   });
 
-    it('should throw when receiving a 403 Forbidden', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden' });
-      await expect(getSpotifyArtist('test')).rejects.toThrow('Spotify API error: 403 Forbidden');
-    });
+  it('should throw when receiving a 403 Forbidden', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden' });
+    expect(getSpotifyArtist('test', FAKE_TOKEN)).rejects.toThrow('Spotify API error: 403 Forbidden');
+  });
 
-    it('should throw when receiving a 429 Rate Limit', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 429, statusText: 'Too Many Requests' });
-      await expect(getSpotifyArtist('test')).rejects.toThrow('Spotify API error: 429 Too Many Requests');
-    });
+  it('should throw when receiving a 429 Rate Limit', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 429, statusText: 'Too Many Requests' });
+    expect(getSpotifyArtist('test', FAKE_TOKEN)).rejects.toThrow('Spotify API error: 429 Too Many Requests');
+  });
 
-    it('should throw when receiving a 500 Internal Server Error', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' });
-      await expect(getSpotifyArtist('test')).rejects.toThrow('Spotify API error: 500 Internal Server Error');
-    });
+  it('should throw when receiving a 500 Internal Server Error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' });
+    expect(getSpotifyArtist('test', FAKE_TOKEN)).rejects.toThrow('Spotify API error: 500 Internal Server Error');
+  });
 
-    it('should throw when fetch rejects', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
-      await expect(getSpotifyArtist('test')).rejects.toThrow('Network error');
+  it('should throw when fetch rejects', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    expect(getSpotifyArtist('test', FAKE_TOKEN)).rejects.toThrow('Network error');
   });
 });

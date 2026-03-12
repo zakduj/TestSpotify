@@ -26,12 +26,19 @@ vi.mock('../../src/services/spotify/search.service', () => ({
   }),
 }));
 
+vi.mock('../../src/store/session.store', () => ({
+  getSession: vi.fn().mockReturnValue({ accessToken: 'fake_access_token', expiresAt: Date.now() + 3600000 }),
+}));
+
 describe('searchArtists', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
 
   beforeEach(() => {
-    req = { query: { q: 'Orelsan' } };
+    req = {
+      query: { q: 'Orelsan' },
+      signedCookies: { session_id: 'fake_session_id' },
+    };
     res = {
       json: vi.fn(),
       status: vi.fn().mockReturnThis(),
@@ -56,7 +63,7 @@ describe('searchArtists', () => {
 
     await searchArtists(req as Request, res as Response);
 
-    expect(getSpotifyArtist).toHaveBeenCalledWith('rap', 20);
+    expect(getSpotifyArtist).toHaveBeenCalledWith('rap', 'fake_access_token', 20);
   });
 
   it('should default offset to 0 when not provided', async () => {
@@ -65,7 +72,7 @@ describe('searchArtists', () => {
 
     await searchArtists(req as Request, res as Response);
 
-    expect(getSpotifyArtist).toHaveBeenCalledWith('jazz', 0);
+    expect(getSpotifyArtist).toHaveBeenCalledWith('jazz', 'fake_access_token', 0);
   });
 
   it('should return 400 when the query parameter is missing', async () => {
